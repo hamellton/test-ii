@@ -1,0 +1,84 @@
+doctype html
+html
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    style.
+      html, body {
+        height: 100%;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        padding: 20px;
+      }
+      .email-container {
+        max-width: 635px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        min-height: 600px;
+      }
+      .email-header {
+        height: 250px;
+        overflow: hidden;
+        margin: 0 auto;
+      }
+      .email-header img {
+        width: 100%;
+        height: 325px;
+      }
+      .email-body h1 {
+        font-size: 24px;
+        color: #333;
+        margin-bottom: 20px;
+      }
+      .email-body p {
+        font-size: 16px;
+        color: #333;
+        line-height: 1.5;
+        margin-bottom: 20px;
+      }
+      .email-footer {
+        font-size: 12px;
+        color: #777;
+        text-align: center;
+        margin-top: 120px;
+        margin-bottom: 100px;
+      }
+      .email-footer a {
+        color: #777;
+        text-decoration: none;
+      }
+  body
+    .email-container
+      .email-header
+        img(src="https://interintellect.nyc3.digitaloceanspaces.com/logos/email-logo.png", alt="Interintellect")
+      .email-body
+        if count === 1
+          h1 Congratulations on listing your first salon!
+          p Dear #{host.name},
+          p
+            | Congratulations on listing 
+            a(href=`${process.env.NEXTAUTH_URL}/salons/${salon.slug}`) #{salon.title}
+          p
+            | To finalize the publication process and receive payment for your events, please make sure to complete our payment onboarding process on your
+            a(href=`${process.env.NEXTAUTH_URL}/dashboard/payouts`) payout page.
+          p Interintellect Team
+        else
+          h1 Your salon has been approved!
+          p Dear #{host.name},
+          p
+            | Congratulations, 
+            a(href=`${process.env.NEXTAUTH_URL}/salons/${salon.slug}`) #{salon.title}
+            |  has been published! We are excited to help you build your following. Here are some things you might consider doing to help us promote your event:
+          p Go
+          p Interintellect Team
+      .email-footer
+        | © 2024 Pynchon Ideas.
+        br
+        | 2810 N Church St. PMB 59729 Wilmington, Delaware 19802
+        br
+        a(href="#") Unsubscribe

@@ -1,0 +1,11 @@
+{
+  "rules": {
+    "no-unused-vars": ["warn", { "vars": "all", "args": "after-used", "ignoreRestSiblings": false }],
+    "semi": ["warn", "always"],
+    "quotes": ["warn", "double"],
+    "indent": ["warn", 2],
+    "jsx-quotes": ["warn", "prefer-double"],
+    "react/jsx-props-no-spreading": "off"
+  },
+  "extends": "next/core-web-vitals"
+}

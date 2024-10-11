@@ -1,0 +1,15 @@
+html,
+body {
+  margin: 0;
+}
+
+#__next {
+  /* background: blue; */
+  position: absolute;
+  inset: 0;
+}
+
+body {
+  background-color: #F1EFE2;
+  max-width: 100%;
+}

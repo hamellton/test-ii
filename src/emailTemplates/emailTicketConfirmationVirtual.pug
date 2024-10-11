@@ -1,0 +1,79 @@
+doctype html
+html
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    style.
+      html, body {
+        height: 100%;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        padding: 20px;
+      }
+      .email-container {
+        max-width: 635px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        border-radius: 8px;
+        padding: 0 20px 20px 20px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        min-height: 600px;
+      }
+      .email-header {
+        height: 250px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        margin: 0 auto;
+      }
+      .email-header img {
+        height: 325px;
+        margin: 0 auto;
+      }
+      .email-body h1 {
+        font-size: 24px;
+        color: #333;
+        margin-bottom: 20px;
+      }
+      .email-body p {
+        font-size: 16px;
+        color: #333;
+        line-height: 1.5;
+        margin-bottom: 20px;
+      }
+      .email-footer {
+        font-size: 12px;
+        color: #777;
+        text-align: center;
+        margin-top: 120px;
+        margin-bottom: 100px;
+      }
+      .email-footer a {
+        color: #777;
+        text-decoration: none;
+      }
+  body
+    .email-container
+      .email-header
+        img(src="https://interintellect.nyc3.digitaloceanspaces.com/logos/email-logo.png", alt="Interintellect")
+      .email-body
+        h1 Your Zoom Details for #{salon.title}
+        p Dear #{name},
+        p Here are the details for your upcoming salon:
+        p
+          a(href=`${process.env.NEXTAUTH_URL}/salons/${salon.slug}`) #{salon.title}
+          |  on #{date} at #{time}.
+        p
+          | Zoom link to join: 
+          a(href=salon.zoomJoinUrl) #{salon.zoomJoinUrl}
+        p Join the world of conversation and enjoy your salon!
+        p Interintellect Team
+      .email-footer
+        | © 2024 Pynchon Ideas.
+        br
+        | 2810 N Church St. PMB 59729 Wilmington, Delaware 19802
+        br
+        a(href="#") Unsubscribe
