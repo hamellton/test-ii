@@ -1,4 +1,5 @@
 interface Window {
+    gtag: (...args: any[]) => void;
     Memberful?: {
         setup: (config: { site: string[] }) => void;
     };

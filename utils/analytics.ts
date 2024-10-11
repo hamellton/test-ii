@@ -1,17 +1,27 @@
-import ReactGA from "react-ga4";
 import { track as trackVercel } from "@vercel/analytics/react";
 import { EventCategories, EventNames } from "@config";
 
 const GA_TRACKING_ID = "G-XVF0ZDKDJQ";
 
 export const initGA = () => {
-  ReactGA.initialize(GA_TRACKING_ID);
+  const script1 = document.createElement("script");
+  script1.src = `https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`;
+  script1.async = true;
+  document.head.appendChild(script1);
+
+  const script2 = document.createElement("script");
+  script2.innerHTML = `
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', '${GA_TRACKING_ID}');
+  `;
+  document.head.appendChild(script2);
 };
 
 export const logPageView = () => {
-  ReactGA.send({
-    hitType: "pageview",
-    page: window.location.pathname,
+  window.gtag("event", "page_view", {
+    page_path: window.location.pathname,
   });
 };
 
@@ -21,13 +31,12 @@ export const logEvent = (
   label?: string,
   data?: { [key: string]: any }
 ) => {
-  ReactGA.event({
-    category: EventCategories[category],
-    action: action,
-    label: label || "",
+  window.gtag("event", action, {
+    event_category: EventCategories[category],
+    event_label: label || "",
     ...data,
   });
-  
+
   trackVercel(action, {
     category: EventCategories[category],
     label: label || "",
