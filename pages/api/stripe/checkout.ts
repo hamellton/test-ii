@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { ErrorResponse, StripeSession, Attendee, HTTPMethod } from "@utils/types";
 import { createTicketCheckoutSession, createTipCheckoutSession, findTipProductAndPrice, createSeriesCheckoutSession } from "@services/stripe";
 import { getUserById } from "@models/user";
-import { addSubscriberToList, removeSubscriberFromList } from "@services/mailchimpService";
+import { handleNewsletterSubscription } from "@services/mailchimpService";
 import { User } from "@prisma/client";
 
 const ticketCheckout = async (req: NextApiRequest, res: NextApiResponse<StripeSession | ErrorResponse>) => {
@@ -12,14 +12,8 @@ const ticketCheckout = async (req: NextApiRequest, res: NextApiResponse<StripeSe
     const host: any = await getUserById(req.body.salon.hostId);
     // const price = await findOrCreatePrice(process.env.TICKET_PRODUCT_ID!, inputPrice);
     const session = await createTicketCheckoutSession(req.body.attendees as Attendee[], req.body.salon.id, req.body.salon.slug, req.body.salon.title, host?.stripeConnectedAccountId || null);
-    
-    if (req.body.isSubscribedToNewsletter && req.body.newsletterEmail) {
-      await addSubscriberToList(req.body.newsletterEmail);
-      console.log(`🚀 Successfully subscriberbed ${req.body.newsletterEmail}`);
-    } else if (req.body.newsletterEmail) {
-      await removeSubscriberFromList(req.body.newsletterEmail);
-      console.log(`🚀 Successfully unsubscribed ${req.body.newsletterEmail}`);
-    }
+
+    await handleNewsletterSubscription(req);
 
     return res.status(200).json({ sessionId: session.id, url: session.url }); // Redirect to the Stripe Checkout page
   } catch (error: unknown) {
@@ -49,11 +43,7 @@ const seriesCheckout = async (req: NextApiRequest, res: NextApiResponse<StripeSe
       seriesTitle
     );
 
-    if (req.body.isSubscribedToNewsletter && req.body.newsletterEmail) {
-      await addSubscriberToList(req.body.newsletterEmail);
-    } else if (req.body.newsletterEmail) {
-      await removeSubscriberFromList(req.body.newsletterEmail);
-    }
+    await handleNewsletterSubscription(req);
 
     return res.status(200).json({ sessionId: session.id, url: session.url });
   } catch (error: unknown) {

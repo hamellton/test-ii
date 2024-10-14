@@ -90,7 +90,7 @@ export const logTipButtonClick = () => {
 };
 
 export const logSocialLinkClick = (linkLabel: string, linkUrl: string) => {
-    logEvent(EventCategories.USER_ACTION, EventNames.SOCIAL_LINK_CLICKED, undefined, { link_label: linkLabel, link_url: linkUrl, data: "test" });
+    logEvent(EventCategories.USER_ACTION, EventNames.SOCIAL_LINK_CLICKED, undefined, { link_label: linkLabel, link_url: linkUrl });
 };
 
 export const logSalonClick = (salonId: string) => {

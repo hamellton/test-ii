@@ -1,8 +1,7 @@
 /** @type {import('next').NextConfig} */
-const path = require("path");
 
 const nextConfig = {
-  transpilePackages: ["crypto-js"],
+  transpilePackages: ["crypto-js", "twilio"],
   reactStrictMode: true,
   redirects: async () => {
     return [

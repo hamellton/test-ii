@@ -139,7 +139,7 @@ export default function SalonTicketBox({
 
       <Button variant="outlined" onClick={() => {
         logSalonTicketBoxPurchaseButtonClick();
-        handleModalOpen;
+        handleModalOpen();
       }} disabled={isPurchaseButtonDisabled()}>Purchase Tickets</Button>
 
       <Box sx={{ mb: 2, width: "760px" }}>

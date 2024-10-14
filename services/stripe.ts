@@ -429,33 +429,6 @@ export const getAccountStatus = async (accountId: string): Promise<AccountStatus
   }
 };
 
-const checkStripeAccountStatus = async (accountId: string) => {
-  try {
-    const accountStatus = await getAccountStatus(accountId);
-
-    console.log("Account Status:", accountStatus);
-
-    if (accountStatus.capabilities) {
-      console.log("Card Payments Capability:", accountStatus.capabilities.card_payments);
-      console.log("Transfers Capability:", accountStatus.capabilities.transfers);
-    } else {
-      console.log("Capabilities are not available.");
-    }
-
-    if (accountStatus.payouts_enabled) {
-      console.log("Payments are enabled.");
-    } else {
-      console.log("Payments are not enabled. Further setup may be required.");
-    }
-
-    if (!accountStatus.details_submitted) {
-      console.log("Account details are not submitted. Prompt the user to complete the setup.");
-    }
-  } catch (error) {
-    console.error("Failed to check account status:", error);
-  }
-};
-
 type RedirectUrl = string;
 
 // Generate a link for Stripe connection

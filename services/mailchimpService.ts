@@ -1,5 +1,6 @@
 import Mailchimp from "@mailchimp/mailchimp_marketing";
 import crypto from "crypto";
+import { NextApiRequest } from "next";
 
 Mailchimp.setConfig({
   apiKey: process.env.MAILCHIMP_API_KEY,
@@ -97,4 +98,32 @@ export const checkSubscriberStatus = async (email: string) => {
   }
 };
   
-  
+export async function handleNewsletterSubscription(req: NextApiRequest) {
+  if (req.body.isSubscribedToNewsletter && req.body.newsletterEmail) {
+    const subscriberStatus = await checkSubscriberStatus(req.body.newsletterEmail);
+    if (subscriberStatus.status === "subscribed") {
+      // If the subscriber is already subscribed, do nothing
+      console.log("Subscriber is already subscribed");
+    } else {
+      try {
+        await addSubscriberToList(req.body.newsletterEmail);
+        console.log("Subscriber added successfully");
+      } catch (error) {
+        console.error("Error adding subscriber:", error);
+      }
+    }
+  } else if (req.body.newsletterEmail) {
+    const subscriberStatus = await checkSubscriberStatus(req.body.newsletterEmail);
+    if (subscriberStatus.status === "unsubscribed") {
+      // If the subscriber is already unsubscribed, do nothing
+      console.log("Subscriber is already unsubscribed");
+    } else {
+      try {
+        await removeSubscriberFromList(req.body.newsletterEmail);
+        console.log("Subscriber removed successfully");
+      } catch (error) {
+        console.error("Error removing subscriber:", error);
+      }
+    }
+  }
+}

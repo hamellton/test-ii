@@ -2,7 +2,7 @@ import Layout from "@components/Layout/Layout";
 import { useRouter } from "next/router";
 import useSWR from "swr";
 import { fetchGetJSON } from "@utils/api-helpers";
-import { SALON_ENDPOINT, STRIPE_ENDPOINT, USER_PUBLIC_ENDPOINT } from "@config";
+import { EventCategories, EventNames, SALON_ENDPOINT, STRIPE_ENDPOINT, USER_PUBLIC_ENDPOINT } from "@config";
 import Stripe from "stripe";
 import LoadingModal from "@components/Dashboard/Modals/LoadingModal";
 import { 
@@ -28,6 +28,25 @@ import styled from "styled-components";
 import { User } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { ExtendedSalon } from "@utils/types";
+import { logEvent } from "@utils/analytics";
+
+const MEMBER_PURCHASE_SUCCESS_EVENT = {
+  category: EventCategories.MEMBER_PURCHASE,
+  name: EventNames.MEMBER_PAYMENT_SUCCESS,
+  description: "Member purchase successful",
+};
+
+const SERIES_PURCHASE_SUCCESS_EVENT = {
+  category: EventCategories.SERIES_PURCHASE,
+  name: EventNames.SERIES_PAYMENT_SUCCESS,
+  description: "Series purchase successful",
+};
+
+const SINGLE_TICKET_PURCHASE_SUCCESS_EVENT = {
+  category: EventCategories.SINGLE_TICKET_PURCHASE,
+  name: EventNames.SINGLE_TICKET_PAYMENT_SUCCESS,
+  description: "Single ticket purchase successful",
+};
 
 const SuccessPageContainer = styled.div<{ isSeriesPurchase: boolean }>`
   max-width: ${({ isSeriesPurchase }) => (isSeriesPurchase ? "100%" : "720px")};
@@ -57,6 +76,34 @@ export default function Success() {
   const { data: salon } = useSWR(salonSlug ? `${SALON_ENDPOINT}/slug/${salonSlug}` : salonId ? `${SALON_ENDPOINT}/${salonId}` : null, fetchGetJSON);
   const { data: host } = useSWR<User>(salon && "hostId" in salon ? `${USER_PUBLIC_ENDPOINT}/${salon.hostId}` : null, fetchGetJSON);
   const { data: payment, error } = useSWR<Stripe.PaymentIntent>(accountId && session_id ? `${STRIPE_ENDPOINT}/payment/id=${session_id}&accountId=${accountId}` : null, fetchGetJSON);
+  
+  useEffect(() => {
+    if (memberPurchase === "true" && salon) {
+      logEvent(MEMBER_PURCHASE_SUCCESS_EVENT.category, MEMBER_PURCHASE_SUCCESS_EVENT.name, MEMBER_PURCHASE_SUCCESS_EVENT.description, {
+        eventTitle: salon.title,
+      });
+    }
+  }, [salon, memberPurchase]);
+  
+  useEffect(() => {
+    if (payment && seriesPurchase === "true") {
+      logEvent(SERIES_PURCHASE_SUCCESS_EVENT.category, SERIES_PURCHASE_SUCCESS_EVENT.name, SERIES_PURCHASE_SUCCESS_EVENT.description, {
+        seriesTitle: payment.description,
+        amount: payment.amount,
+        currency: payment.currency,
+      });
+    }
+  }, [payment, seriesPurchase]);
+  
+  useEffect(() => {
+    if (payment && !(memberPurchase === "true") && salon) {
+      logEvent(SINGLE_TICKET_PURCHASE_SUCCESS_EVENT.category, SINGLE_TICKET_PURCHASE_SUCCESS_EVENT.name, SINGLE_TICKET_PURCHASE_SUCCESS_EVENT.description, {
+        eventTitle: salon.title,
+        amount: payment.amount,
+        currency: payment.currency,
+      });
+    }
+  }, [payment, memberPurchase, salon]);
 
   useEffect(() => {
     if (seriesPurchase === "true" && selectedEpisodes) {
@@ -79,7 +126,8 @@ export default function Success() {
     }
   }, [seriesPurchase, selectedEpisodes]);
 
-  if (!payment && (memberPurchase !== "true" || seriesPurchase !== "true")) return <LoadingModal isLoading={true} />;
+  // if (!payment && (memberPurchase !== "true" || seriesPurchase !== "true")) return <LoadingModal isLoading={true} />;
+  if (!payment && (memberPurchase !== "true")) return <LoadingModal isLoading={true} />;
 
   if (error) return <div>Failed to load payment</div>;
 
