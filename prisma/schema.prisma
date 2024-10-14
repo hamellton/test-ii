@@ -41,6 +41,8 @@ model User {
   slug             String?        @unique
   email            String         @unique
   emailVerified    DateTime?
+  phoneNumber      String?        @unique
+  phoneVerified    DateTime?
   createdAt        DateTime       @default(now()) @map("created_at")
   updatedAt        DateTime       @updatedAt @map("updated_at")
   image            String?

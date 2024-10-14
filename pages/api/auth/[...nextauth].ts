@@ -120,7 +120,7 @@ export const authOptions: NextAuthOptions = {
         phoneNumber: { label: "Phone Number", type: "text" },
         verificationCode: { label: "Verification Code", type: "text" }
       },
-      authorize: async (credentials) => {
+      authorize: async (credentials: any) => {
         const { phoneNumber, verificationCode } = credentials;
         const response = await fetch(`${process.env.NEXTAUTH_URL}/api/phoneAuth/phone-auth`, {
           method: "POST",
@@ -136,7 +136,7 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
       }
-    }
+    } as any
   ],
   callbacks: {
     async session({ session, user }) {
