@@ -12,8 +12,9 @@ import Layout from "@components/Layout/Layout";
 import LandingPageForm from "@components/Homepage/LandingPageForm";
 import useSWR from "swr";
 import { ExtendedSalon } from "@utils/types";
-import { SALON_ENDPOINT } from "@config";
+import { II_CONTENTFUL_API, SALON_ENDPOINT } from "@config";
 import LoadingModal from "@components/Dashboard/Modals/LoadingModal";
+import { HomePageData } from "@utils/contentfulTypes";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -26,6 +27,9 @@ export default function Home() {
   const range = "Sheet1!A1:M10"; // Replace with your desired range
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_SHEETS_API_KEY;
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
+
+  const { data: homePageData, error: homePageDataError } = useSWR<HomePageData>(`${II_CONTENTFUL_API}/homepage`, fetcher);
+  console.log("🚀 ~ Home ~ homePageData:", homePageData);
 
   const { data, error } = useSWR(url, fetcher);
 

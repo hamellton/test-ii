@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
+const path = require("path");
 
 const nextConfig = {
-  transpilePackages: ["crypto-js", "twilio"],
+  transpilePackages: ["crypto-js"],
   reactStrictMode: true,
   redirects: async () => {
     return [
@@ -52,6 +53,10 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "www.gravatar.com",
+      },
+      {
+        protocol: "https",
+        hostname: "images.ctfassets.net",
       },
     ],
   },

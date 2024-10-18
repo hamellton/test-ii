@@ -238,3 +238,104 @@ model HostRequest {
   status    String
   createdAt DateTime @default(now())
 }
+
+model HomePage {
+  id                    Int               @id @default(autoincrement())
+  heroSection           HeroSection?      @relation(fields: [heroSectionId], references: [id])
+  heroSectionId         Int?              @unique
+  partnersSection       PartnersSection?  @relation(fields: [partnersSectionId], references: [id])
+  partnersSectionId     Int?              @unique
+  aboutUsSection        AboutUsSection?   @relation(fields: [aboutUsSectionId], references: [id])
+  aboutUsSectionId      Int?              @unique
+  joinCommunitySection  JoinCommunitySection? @relation(fields: [joinCommunitySectionId], references: [id])
+  joinCommunitySectionId Int?             @unique
+  mostofInterintellectCards MostOfInterintellectCard[]
+  teamMembers           TeamMember[]
+  testimonials          Testimonial[]
+  subscriptions         Subscription[]
+}
+
+model HeroSection {
+  id          Int      @id @default(autoincrement())
+  title       String
+  subTitle    String
+  homePage    HomePage?
+  buttons     ContenfulButton[]
+}
+
+model ContenfulButton {
+  id                    Int      @id @default(autoincrement())
+  text                  String
+  url                   String
+  heroSection           HeroSection?  @relation(fields: [heroSectionId], references: [id])
+  heroSectionId         Int?
+  joinCommunitySection  JoinCommunitySection? @relation(fields: [joinCommunitySectionId], references: [id])
+  joinCommunitySectionId Int?
+}
+
+model PartnersSection {
+  id          Int      @id @default(autoincrement())
+  title       String
+  imageUrl    String
+  homePage    HomePage?
+}
+
+model AboutUsSection {
+  id          Int      @id @default(autoincrement())
+  title       String
+  subTitle    String
+  description String
+  logoUrl     String
+  aboutUsImgUrl String
+  homePage    HomePage?
+}
+
+model JoinCommunitySection {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  imgUrl      String
+  homePage    HomePage?
+  buttons     ContenfulButton[]
+}
+
+model MostOfInterintellectCard {
+  id          Int      @id @default(autoincrement())
+  title       String
+  buttonTitle String
+  buttonUrl   String
+  cardImg     String
+  description String
+  homePage    HomePage @relation(fields: [homePageId], references: [id], onDelete: Cascade)
+  homePageId  Int
+}
+
+model TeamMember {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  imgUrl      String
+  homePage    HomePage @relation(fields: [homePageId], references: [id], onDelete: Cascade)
+  homePageId  Int
+}
+
+model Testimonial {
+  id          Int      @id @default(autoincrement())
+  comment     String
+  name        String
+  title       String
+  homePage    HomePage @relation(fields: [homePageId], references: [id], onDelete: Cascade)
+  homePageId  Int
+}
+
+model Subscription {
+  id          Int      @id @default(autoincrement())
+  name        String
+  annualPrice Float
+  monthlyPrice Float
+  perks       String[]
+  buttonText  String
+  imgUrl      String
+  homePage    HomePage @relation(fields: [homePageId], references: [id], onDelete: Cascade)
+  homePageId  Int
+}

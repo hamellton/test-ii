@@ -15,6 +15,7 @@ export const TICKET_ENDPOINT = "/api/ticket";
 export const PAYOUTS_ENDPOINT = "/api/payouts";
 export const ORDERS_ENDPOINT = "/api/orders";
 export const NEWSLETTER_SUBSCRIBE = "/api/common/subscribe";
+export const II_CONTENTFUL_API = "/api/contentful";
 
 export const NUM_STAGES = 4;
 export const KEY_NAME = "salonData";
