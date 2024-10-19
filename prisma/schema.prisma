@@ -249,15 +249,18 @@ model HomePage {
   aboutUsSectionId      Int?              @unique
   joinCommunitySection  JoinCommunitySection? @relation(fields: [joinCommunitySectionId], references: [id], onDelete: Cascade)
   joinCommunitySectionId Int?             @unique
-  mostofInterintellectCards MostOfInterintellectCard[] @relation(onDelete: Cascade)
-  teamMembers           TeamMember[] @relation(onDelete: Cascade)
-  testimonials          Testimonial[] @relation(onDelete: Cascade)
-  subscriptions         Subscription[] @relation(onDelete: Cascade)
+  mostofInterintellectCards MostOfInterintellectCard[]
+  teamMembers           TeamMember[]
+  testimonials          Testimonial[]
+  subscriptions         Subscription[]
+  contentPageList       ContentPageList?
+  contentPageListId     Int?              @unique
+  @@unique([id])
 }
 
 model ContentPageList {
   id                    Int               @id @default(autoincrement())
-  homePage              HomePage?         @relation(fields: [homePageId], references: [id], onDelete: Cascade)
+  homePage              HomePage?         @relation(fields: [homePageId], references: [id])
   homePageId            Int?              @unique
 }
 
