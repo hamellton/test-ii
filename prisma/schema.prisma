@@ -241,18 +241,24 @@ model HostRequest {
 
 model HomePage {
   id                    Int               @id @default(autoincrement())
-  heroSection           HeroSection?      @relation(fields: [heroSectionId], references: [id])
+  heroSection           HeroSection?      @relation(fields: [heroSectionId], references: [id], onDelete: Cascade)
   heroSectionId         Int?              @unique
-  partnersSection       PartnersSection?  @relation(fields: [partnersSectionId], references: [id])
+  partnersSection       PartnersSection?  @relation(fields: [partnersSectionId], references: [id], onDelete: Cascade)
   partnersSectionId     Int?              @unique
-  aboutUsSection        AboutUsSection?   @relation(fields: [aboutUsSectionId], references: [id])
+  aboutUsSection        AboutUsSection?   @relation(fields: [aboutUsSectionId], references: [id], onDelete: Cascade)
   aboutUsSectionId      Int?              @unique
-  joinCommunitySection  JoinCommunitySection? @relation(fields: [joinCommunitySectionId], references: [id])
+  joinCommunitySection  JoinCommunitySection? @relation(fields: [joinCommunitySectionId], references: [id], onDelete: Cascade)
   joinCommunitySectionId Int?             @unique
-  mostofInterintellectCards MostOfInterintellectCard[]
-  teamMembers           TeamMember[]
-  testimonials          Testimonial[]
-  subscriptions         Subscription[]
+  mostofInterintellectCards MostOfInterintellectCard[] @relation(onDelete: Cascade)
+  teamMembers           TeamMember[] @relation(onDelete: Cascade)
+  testimonials          Testimonial[] @relation(onDelete: Cascade)
+  subscriptions         Subscription[] @relation(onDelete: Cascade)
+}
+
+model ContentPageList {
+  id                    Int               @id @default(autoincrement())
+  homePage              HomePage?         @relation(fields: [homePageId], references: [id], onDelete: Cascade)
+  homePageId            Int?              @unique
 }
 
 model HeroSection {
