@@ -444,3 +444,5 @@ export function findLatestSalonEntry(
 export const formatUnixTimestamp = (timestamp: number): string => {
   return new Date(timestamp * 1000).toISOString();
 };
+
+export const fetcher = (url: string) => fetch(url).then((res) => res.json());

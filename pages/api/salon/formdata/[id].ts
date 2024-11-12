@@ -69,7 +69,9 @@ const handlePostRequest = async (req: AuthorizedRequest, res: NextApiResponse): 
 
     if (!isDraft) {
       await emailSalonConfirmation(salon.id, host!.id);
-      await notifyEvent(`salons/${salon.slug}`, "created");
+      await notifyEvent(`salons/${salon.slug}`, "created", {
+        salonTitle: `${salon!.title}`,
+      });
     }
 
     res.status(201).json(salon);

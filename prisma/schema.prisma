@@ -36,38 +36,38 @@ model Session {
 }
 
 model User {
-  id               String         @id @default(cuid())
-  name             String?
-  slug             String?        @unique
-  email            String         @unique
-  emailVerified    DateTime?
-  phoneNumber      String?        @unique
-  phoneVerified    DateTime?
-  createdAt        DateTime       @default(now()) @map("created_at")
-  updatedAt        DateTime       @updatedAt @map("updated_at")
-  image            String?
-  memberfulId      String?        @unique
-  fullname         String?
-  profileImageUrl  String?
-  bio              String?
-  quote            String?
-  webLink          String?
-  xLink            String?
-  instaLink        String?
-  substackLink     String?
-  accounts         Account[]
-  sessions         Session[]
-  salons           Salon[]        @relation("HostSalons") // Assuming this refers to the salons they host
-  coHostedSalons   Salon[]        @relation("CoHostSalons") // If there's a coHosts field referring back to User
-  series           Series[]
-  lastMemberTicket DateTime?
-  memberTickets    MemberTicket[]
-  tips             Tip[]
+  id                       String         @id @default(cuid())
+  name                     String?
+  slug                     String?        @unique
+  email                    String         @unique
+  emailVerified            DateTime?
+  phoneNumber              String?        @unique
+  phoneVerified            DateTime?
+  createdAt                DateTime       @default(now()) @map("created_at")
+  updatedAt                DateTime       @updatedAt @map("updated_at")
+  image                    String?
+  memberfulId              String?        @unique
+  fullname                 String?
+  profileImageUrl          String?
+  bio                      String?
+  quote                    String?
+  webLink                  String?
+  xLink                    String?
+  instaLink                String?
+  substackLink             String?
+  accounts                 Account[]
+  sessions                 Session[]
+  salons                   Salon[]        @relation("HostSalons") // Assuming this refers to the salons they host
+  coHostedSalons           Salon[]        @relation("CoHostSalons") // If there's a coHosts field referring back to User
+  series                   Series[]
+  lastMemberTicket         DateTime?
+  memberTickets            MemberTicket[]
+  tips                     Tip[]
   stripeConnectedAccountId String?
-  notifyOnCreate    Boolean        @default(false)
-  notifyOnUpdate    Boolean        @default(false)
-  notifyOnDelete    Boolean        @default(false)
-  role              USER_ROLE      @default(USER)
+  notifyOnCreate           Boolean        @default(false)
+  notifyOnUpdate           Boolean        @default(false)
+  notifyOnDelete           Boolean        @default(false)
+  role                     USER_ROLE      @default(USER)
 }
 
 enum USER_ROLE {
@@ -128,27 +128,27 @@ model Salon {
 }
 
 model SalonHistory {
-  id         String   @id @default(cuid())
-  salonId    String
-  changes    Json
-  changedAt  DateTime @default(now())
-  Salon      Salon    @relation(fields: [salonId], references: [id], onDelete: Cascade)
+  id        String   @id @default(cuid())
+  salonId   String
+  changes   Json
+  changedAt DateTime @default(now())
+  Salon     Salon    @relation(fields: [salonId], references: [id], onDelete: Cascade)
 }
 
 model SpecialGuest {
-  id        String @id @default(cuid())
-  name      String
-  email     String
-  salonId   String
-  salon     Salon   @relation(fields: [salonId], references: [id], onDelete: Cascade)
+  id      String @id @default(cuid())
+  name    String
+  email   String
+  salonId String
+  salon   Salon  @relation(fields: [salonId], references: [id], onDelete: Cascade)
 }
 
 model Tag {
-  id     String   @id @default(cuid())
-  label  String   @unique
+  id       String   @id @default(cuid())
+  label    String   @unique
   isActive Boolean  @default(true)
-  Salons Salon[]  @relation("SalonTags")
-  Series Series[] @relation("SeriesTags")
+  Salons   Salon[]  @relation("SalonTags")
+  Series   Series[] @relation("SeriesTags")
 }
 
 enum SALON_STATE {
@@ -210,6 +210,14 @@ model PublicTicket {
   customerEmail   String
   stripePaymentId String
   createdAt       DateTime @default(now())
+  status          TicketStatus @default(PENDING)
+}
+
+enum TicketStatus {
+  PENDING
+  APPROVED
+  DECLINED
+  EXPIRED
 }
 
 model MemberTicket {
@@ -239,113 +247,10 @@ model HostRequest {
   createdAt DateTime @default(now())
 }
 
-// Contenful data
-model HomePage {
-  id                    Int               @id @default(autoincrement())
-  heroSection           HeroSection?      @relation(fields: [heroSectionId], references: [id], onDelete: Cascade)
-  heroSectionId         Int?              @unique
-  partnersSection       PartnersSection?  @relation(fields: [partnersSectionId], references: [id], onDelete: Cascade)
-  partnersSectionId     Int?              @unique
-  aboutUsSection        AboutUsSection?   @relation(fields: [aboutUsSectionId], references: [id], onDelete: Cascade)
-  aboutUsSectionId      Int?              @unique
-  joinCommunitySection  JoinCommunitySection? @relation(fields: [joinCommunitySectionId], references: [id], onDelete: Cascade)
-  joinCommunitySectionId Int?             @unique
-  mostofInterintellectCards MostOfInterintellectCard[]
-  teamMembers           TeamMember[]
-  testimonials          Testimonial[]
-  subscriptions         Subscription[]
-  contentPageList       ContentPageList?
-  contentPageListId     Int?              @unique
+model Page {
+  id    String    @id @default(cuid())
+  name  String
+  value Json
+
   @@unique([id])
-}
-
-model ContentPageList {
-  id                    Int               @id @default(autoincrement())
-  homePage              HomePage?         @relation(fields: [homePageId], references: [id])
-  homePageId            Int?              @unique
-}
-
-model HeroSection {
-  id          Int      @id @default(autoincrement())
-  title       String
-  subTitle    String
-  homePage    HomePage?
-  buttons     ContenfulButton[]
-}
-
-model ContenfulButton {
-  id                    Int      @id @default(autoincrement())
-  text                  String
-  url                   String
-  heroSection           HeroSection?  @relation(fields: [heroSectionId], references: [id])
-  heroSectionId         Int?
-  joinCommunitySection  JoinCommunitySection? @relation(fields: [joinCommunitySectionId], references: [id])
-  joinCommunitySectionId Int?
-}
-
-model PartnersSection {
-  id          Int      @id @default(autoincrement())
-  title       String
-  imageUrl    String
-  homePage    HomePage?
-}
-
-model AboutUsSection {
-  id          Int      @id @default(autoincrement())
-  title       String
-  subTitle    String
-  description String
-  logoUrl     String
-  aboutUsImgUrl String
-  homePage    HomePage?
-}
-
-model JoinCommunitySection {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String
-  imgUrl      String
-  homePage    HomePage?
-  buttons     ContenfulButton[]
-}
-
-model MostOfInterintellectCard {
-  id          Int      @id @default(autoincrement())
-  title       String
-  buttonTitle String
-  buttonUrl   String
-  cardImg     String
-  description String
-  homePage    HomePage @relation(fields: [homePageId], references: [id], onDelete: Cascade)
-  homePageId  Int
-}
-
-model TeamMember {
-  id          Int      @id @default(autoincrement())
-  name        String
-  description String
-  imgUrl      String
-  homePage    HomePage @relation(fields: [homePageId], references: [id], onDelete: Cascade)
-  homePageId  Int
-}
-
-model Testimonial {
-  id          Int      @id @default(autoincrement())
-  comment     String
-  name        String
-  title       String
-  homePage    HomePage @relation(fields: [homePageId], references: [id], onDelete: Cascade)
-  homePageId  Int
-}
-
-model Subscription {
-  id          Int      @id @default(autoincrement())
-  name        String
-  annualPrice Float
-  monthlyPrice Float
-  perks       String[]
-  buttonText  String
-  imgUrl      String
-  homePage    HomePage @relation(fields: [homePageId], references: [id], onDelete: Cascade)
-  homePageId  Int
 }

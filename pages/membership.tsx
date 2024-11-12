@@ -1,116 +1,92 @@
 import Layout from "@components/Layout/Layout";
 import { Box, Typography, Link } from "@mui/material";
-import { USER_STATUS_ENDPOINT } from "@config";
+import { II_CONTENTFUL_API, USER_STATUS_ENDPOINT } from "@config";
 import { frontEndAuthResponse } from "@utils/types";
 import useSWR from "swr";
 import { fetchGetJSON } from "@utils/api-helpers";
 import MembershipCard from "@components/Dashboard/Membership/MembershipCard/MembershipCard";
-import { MembershipList, MembershipNotes, MembershipTextWrapper } from "../styles/pages/MembershipStyles";
+import { MembershipList, MembershipTextWrapper } from "../styles/pages/MembershipStyles";
 import MembershipHeader from "@components/Dashboard/Membership/MembershipHeader/MembershipHeader";
 import useDevice, { DeviceTypes } from "@/hooks/useDevice";
-
-const beginnerText = (
-  <MembershipList>
-    <li>Get one free ticket per month for any paid online event*</li>
-    <li>Access our online community forum</li>
-    <li>Attend all standard offline events around the world – or get help hosting</li>
-    <li>Get major discounts on special offline events (festivals, talks)</li>
-    <li>Access all online members only events and specials (weekly writing sessions, Christmas Party, Single Mingle, special celebrity visits)</li>
-    <li>Come hang out with Interintellect hosts in our forum, attend host trainings</li>
-    <li>Access recordings of members only videos and trainings</li>
-    <MembershipNotes>
-      <li>All event access dependent on ticket availability</li>
-    </MembershipNotes>
-  </MembershipList>
-);
-
-const explorerText = (
-  <MembershipList>
-    <li>Get one free ticket per month for any paid online event*</li>
-    <li>Access our online community forum</li>
-    <li>Attend all standard offline events around the world – or get help hosting</li>
-    <li>Get major discounts on special offline events (festivals, talks)</li>
-    <li>Access all online members only events and specials (weekly writing sessions, Christmas Party, Single Mingle, special celebrity visits)</li>
-    <li>Come hang out with Interintellect hosts in our forum, attend host trainings</li>
-    <li>Access recordings of members only videos and trainings</li>
-    <MembershipNotes>
-      <li>All event access dependent on ticket availability</li>
-    </MembershipNotes>
-  </MembershipList>
-);
-
-const supporterText = (
-  <MembershipList>
-    <li>Quarterly specials with Interintellect founder and CEO Anna Gát</li>
-    <li>FREE attendance of EVERY paid online event*</li>
-    <li>Early Bird notification for offline specials and high-demand online events</li>
-    <li>Access our online community forum</li>
-    <li>Attend all standard offline events around the world – or get help hosting</li>
-    <li>Get major discounts on special offline events (festivals, talks)</li>
-    <li>Access all online members only events and specials (weekly writing sessions, Christmas Party, Single Mingle, special celebrity visits)</li>
-    <li>Come hang out with Interintellect hosts in our forum, attend host trainings</li>
-    <li>Access recordings of members only videos and trainings</li>
-    <MembershipNotes>
-      <li>All event access dependent on ticket availability</li>
-      <li>Valid for 10 years</li>
-    </MembershipNotes>
-  </MembershipList>
-);
+import { HomePageData } from "@utils/contentfulTypes";
+import { fetcher } from "@utils/frontend-helpers";
 
 export default function Membership() {
 
   const { data: user } = useSWR<frontEndAuthResponse>(USER_STATUS_ENDPOINT, fetchGetJSON);
+  const { data: contenfulPage } = useSWR<HomePageData>(`${II_CONTENTFUL_API}/pages?name=homePage`, fetcher);
 
   const { device } = useDevice() ?? {};
 
   const isMember = user?.isMember;
 
+  if (!contenfulPage) {
+    return null;
+  }
+
+  const {
+    subscriptionsSection,
+  } = contenfulPage?.value;
+
   return (
     <Layout>
-      <MembershipHeader />
+      <MembershipHeader title={subscriptionsSection.membershipPageTitle} />
       <Box sx={{
         display: "flex",
         flexDirection: "row",
-        justifyContent: "space-around",
-        gap: 8,
+        justifyContent: "center",
+        gap: "40px",
         flexWrap: "wrap",
-        margin: "auto",
-        mt: device === DeviceTypes.MOBILE ? "32px" : 8,
-        mb: device === DeviceTypes.MOBILE ? "27px" : isMember ? 6 : "102px",
-        padding: "0 11px",
+        mt: device === DeviceTypes.MOBILE ? "32px" : 0,
+        mb: device === DeviceTypes.MOBILE ? "27px" : isMember ? 6 : "0",
+        padding: device === DeviceTypes.MOBILE ? "0 20px" : "0 130px",
       }}>
-        <MembershipCard
-          coverImage="/images/beginner-image.svg"
-          memberType="Beginner"
-          annualPrice="176.99"
-          monthlyPrice="16.99"
-          text={beginnerText}
-          buttonText="Join our community"
-          isMember={isMember}
-          planName={user?.planName}
-          user={user}
-        />
-        <MembershipCard
-          coverImage="/images/explorer-image.svg"
-          memberType="Explorer"
-          annualPrice="269.99"
-          monthlyPrice="24.99"
-          text={explorerText}
-          buttonText="Explore with us"
-          isMember={isMember}
-          planName={user?.planName}
-          user={user}
-        />
-        <MembershipCard
-          coverImage="/images/supporter-image.svg"
-          memberType="Emeritus"
-          annualPrice="2000"
-          text={supporterText}
-          buttonText="Support us"
-          isMember={isMember}
-          planName={user?.planName}
-          user={user}
-        />
+        {subscriptionsSection && subscriptionsSection.cards && subscriptionsSection.cards.length > 0 && subscriptionsSection.cards.map((plan: any, index: number) => {
+          let memberType = "";
+          let annualPrice = "";
+          let monthlyPrice = "";
+
+          if (index === 0) {
+            memberType = "Beginner";
+            annualPrice = "176.99";
+            monthlyPrice = "16.99";
+          } else if (index === 1) {
+            memberType = "Explorer";
+            annualPrice = "269.99";
+            monthlyPrice = "24.99";
+          } else if (index === 2) {
+            memberType = "Emeritus";
+            annualPrice = "2000";
+            monthlyPrice = "";
+          }
+
+          return (
+            <MembershipCard
+              key={memberType}
+              coverImage={plan.imgUrl}
+              memberType={memberType}
+              annualPrice={annualPrice}
+              monthlyPrice={monthlyPrice}
+              text={
+                <MembershipList>
+                  {plan.perks.map((perk: string, perkIndex: number) => (
+                    <li key={perkIndex}>
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7.66667 1.45703V14.7904M12.3807 3.40965L2.95262 12.8377M14.3333 8.1237H1M12.3807 12.8377L2.95262 3.40965" stroke="#FC714E" strokeWidth="1.81818" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      {perk}
+                    </li>
+                  ))}
+                </MembershipList>
+              }
+              buttonText={plan.buttonText}
+              isMember={isMember}
+              planName={user?.planName}
+              user={user}
+              isThrirdCard={index === 2}
+            />
+          );
+        })}
       </Box>
       {user?.isMember && (
         <MembershipTextWrapper>

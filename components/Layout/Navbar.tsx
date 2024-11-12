@@ -1,16 +1,104 @@
 import React from "react";
 import MenuIcon from "@mui/icons-material/Menu";
-import { Fira_Sans } from "next/font/google";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { AppBar, Box, Toolbar, Typography, Button, Menu, MenuItem } from "@mui/material";
-import { logAppBarCloseClick, logCommunityClick, logHostingClick, logListSalonClick, logLoginClick, logLogoutClick, logMembershipClick, logMyDashboardClick, logSalonsAndGatheringsClick, logSignUpClick } from "@utils/analytics-helpers";
+import {
+  AppBar,
+  Box,
+  Toolbar,
+  Button,
+  Menu,
+  MenuItem,
+  IconButton,
+} from "@mui/material";
+import styled from "styled-components";
+import Image from "next/image";
+import {
+  logAppBarCloseClick,
+  logCommunityClick,
+  logHostingClick,
+  logSalonsAndGatheringsClick,
+  logLoginClick,
+  logLogoutClick,
+  logMembershipClick,
+  logMyDashboardClick,
+  logSignUpClick,
+  // logListSalonClick
+} from "@utils/analytics-helpers";
 
-const firaSans = Fira_Sans({
-  subsets: ["latin"],
-  weight: "700",
-});
+interface ActiveLinkProps {
+  isActive: boolean;
+  children: React.ReactNode;
+  href: string;
+  onClick: () => void;
+}
+
+const ActiveLink = styled(({ isActive, ...props }: ActiveLinkProps) => (
+  <Link {...props} />
+))(({ isActive }) => ({
+  color: isActive ? "#FC714E" : "inherit",
+  textDecoration: isActive ? "underline" : "none",
+  textUnderlineOffset: "4px",
+  textDecorationColor: "#FC714E",
+}));
+
+const StyledAppBar = styled(AppBar)`
+  background-color: transparent;
+  color: #231F20;
+  box-shadow: none;
+  padding: 20px;
+
+  @media (max-width: 768px) {
+    border-bottom: 1px solid #C4C4C4;
+    padding: 15px 15px 5px 15px;
+  }
+`;
+
+const LogoContainer = styled(Box)`
+  /* max-width: 130px; */
+`;
+
+const StyledToolbar = styled(Toolbar)`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0;
+  height: auto;
+`;
+
+const MenuContainer = styled(Box)`
+  display: none;
+  flex-grow: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+
+  @media (min-width: 600px) {
+    display: flex;
+  }
+`;
+
+const ActionButtonContainer = styled(Box)`
+  flex-grow: 0;
+  display: none;
+  align-items: center;
+
+  @media (min-width: 600px) {
+    display: flex;
+  }
+`;
+
+const StyledButton = styled(Button)`
+  padding: 7px 20px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 25.6px;
+  text-align: left;
+  color: #231F20;
+  text-transform: none;
+`;
 
 export default function ButtonAppBar() {
   const { data: session } = useSession();
@@ -20,11 +108,9 @@ export default function ButtonAppBar() {
 
   const handleLogout = async () => {
     await signOut({ redirect: false, callbackUrl: "/" });
-  
     localStorage.removeItem("salonData");
     localStorage.removeItem("fileMeta");
     localStorage.removeItem("fileDataUrl");
-  
     logLogoutClick();
     window.location.href = "/";
   };
@@ -38,134 +124,113 @@ export default function ButtonAppBar() {
     logAppBarCloseClick();
     setAnchorEl(null);
     if (url) {
-      if (url === "/dashboard") {
-        logMyDashboardClick();
-      } else if (url === "/salons") {
+      switch (url) {
+      case "/salons":
         logSalonsAndGatheringsClick();
-      } else if (url === "/hosting") {
+        break;
+      case "/hosting":
         logHostingClick();
-      } else if (url === "/community") {
+        break;
+      case "/community":
         logCommunityClick();
-      } else if (url === "/dashboard/salon") {
-        logListSalonClick();
-      } else if (url === "/logout") {
+        break;
+      case "/membership":
+        logMembershipClick();
+        break;
+      case "/dashboard":
+        logMyDashboardClick();
+        break;
+      case "/logout":
         logLogoutClick();
+        break;
+      case "/signin":
+        logLoginClick();
+        break;
+      case "/signup":
+        logSignUpClick();
+        break;
+      default:
+        break;
       }
-
       router.push(url);
     }
   };
 
   return (
-    <Box>
-      <AppBar position="static" style={{ backgroundColor: "transparent", color: "black", boxShadow: "none", borderBottom: "1px solid #C4C4C4" }}>
-        <Toolbar>
-          <Link href={"/"}>
-            <Box sx={{ maxWidth: "130px", pt: 0.5 }}>
-              <Typography
-                sx={{
-                  fontWeight: 700,
-                  fontSize: "20px",
-                  color: "black",
-                  fontFamily: "Fira Sans",
-                  letterSpacing: "0.1em" // Add letter spacing here
-                }}
-                className={firaSans.className}
-              >
-                Interintellect
-              </Typography>
-            </Box>
+    <Box id="header">
+      <StyledAppBar position="static">
+        <StyledToolbar>
+          <Link href="/" legacyBehavior>
+            <a>
+              <LogoContainer>
+                <Image src="/main-logo.png" alt="Interintellect Logo" width={190} height={40} />
+              </LogoContainer>
+            </a>
           </Link>
 
-          {/* Mobile Navbar */}
-          <Box sx={{
-            display: { xs: "flex", md: "none" },
-            flexGrow: 1,
-            justifyContent: "flex-end",
-            alignItems: "center",
-            gap: 2,
-          }}>
-            <Link href="/membership" onClick={logMembershipClick}>
-              Membership
-            </Link>
-            <div>
-              <Button
-                id="basic-button"
-                aria-controls={open ? "basic-menu" : undefined}
-                aria-haspopup="true"
-                aria-expanded={open ? "true" : undefined}
-                onClick={handleClick}
-              >
-                <MenuIcon />
-              </Button>
-              <Menu
-                id="basic-menu"
-                anchorEl={anchorEl}
-                open={open}
-                onClose={() => handleClose()}
-                MenuListProps={{ "aria-labelledby": "basic-button" }}
-              >
-                <MenuItem onClick={() => handleClose("/dashboard")}>My Dashboard</MenuItem>
-                <MenuItem onClick={() => handleClose("/salons")}>Salons and Gathering</MenuItem>
-                <MenuItem onClick={() => handleClose("/hosting")}>Hosting</MenuItem>
-                <MenuItem onClick={() => handleClose("/community")}>Community</MenuItem>
-                <MenuItem onClick={() => handleClose("/dashboard/salon")}>List a salon</MenuItem>
-                <MenuItem onClick={() => handleClose("/logout")}>Logout</MenuItem>
-              </Menu>
-            </div>
-          </Box>
-
-
-          {/* Desktop Navbar */}
-          <Box sx={{ display: { xs: "none", md: "flex" }, flexGrow: 1, flex: "grow", alignItems: "center", justifyContent: "center", gap: 4 }}>
-            <Link href="/salons" onClick={logSalonsAndGatheringsClick}>
-              Salons & Gatherings
-            </Link>
-            <Link href="/hosting" onClick={logHostingClick}>
-              Hosting
-            </Link>
-            <Link href="/community" onClick={logCommunityClick}>
+          <MenuContainer>
+            <ActiveLink href="/salons" onClick={logSalonsAndGatheringsClick} isActive={router.pathname === "/salons"}>
+              Salons & Gathering
+            </ActiveLink>
+            <ActiveLink href="/hosting" onClick={logHostingClick} isActive={router.pathname === "/hosting"}>
+              Become a Host
+            </ActiveLink>
+            <ActiveLink href="/community" onClick={logCommunityClick} isActive={router.pathname === "/community"}>
               Community
-            </Link>
-            <Link href="/membership" onClick={logMembershipClick}>
-              Membership
-            </Link>
-          </Box>
-          <Box sx={{ flexGrow: 0, display: { xs: "none", md: "flex" }, alignItems: "center" }}>
+            </ActiveLink>
+            <ActiveLink href="/membership" onClick={logMembershipClick} isActive={router.pathname === "/membership"}>
+              Plans
+            </ActiveLink>
+          </MenuContainer>
+
+          <ActionButtonContainer>
             {session && (
-              <Button color="inherit" sx={{ mr: 2, textTransform: "none" }} onClick={handleLogout}>
+              <StyledButton onClick={handleLogout}>
                 Log out
-              </Button>
+              </StyledButton>
             )}
             {!session && (
-              <Box sx={{
-                display: "flex",
-                gap: 4,
-                alignItems: "center",
-              }}>
+              <Box sx={{ display: "flex", gap: 4, alignItems: "center", justifyContent: "flex-end", width: "190px" }}>
                 <Link href="/signin" onClick={logLoginClick}>
-                  Log in
+                  <StyledButton variant="contained" color="secondary">
+                    Login
+                  </StyledButton>
                 </Link>
-                <Link href="/signup" onClick={logSignUpClick}>
+                {/* <Link href="/signup" onClick={logSignUpClick}>
                   Sign up
-                </Link>
-                <Link href={"/dashboard/salon"} onClick={logListSalonClick}>
-                  <Button variant="contained" color="secondary" sx={{ padding: "10px 18px" }}>
+                </Link> */}
+                {/* <Link href={"/dashboard/salon"} onClick={logListSalonClick}>
+                  <Button variant="contained" color="secondary">
                     List a salon
                   </Button>
-                </Link>
+                </Link> */}
               </Box>
             )}
             {session && (
               <Link href={"/dashboard"} onClick={logMyDashboardClick}>
-                <Button variant="contained" color="secondary" sx={{ padding: "10px 18px" }}>
+                <StyledButton variant="contained" color="secondary">
                   My Dashboard
-                </Button>
+                </StyledButton>
               </Link>
             )}
+          </ActionButtonContainer>
+
+          <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" }, justifyContent: "flex-end" }}>
+            <IconButton sx={{padding: 0 }} size="large" edge="start" color="inherit" aria-label="menu" onClick={handleClick}>
+              <MenuIcon />
+            </IconButton>
+            <Menu anchorEl={anchorEl} open={open} onClose={() => handleClose()}>
+              <MenuItem onClick={() => handleClose("/salons")}>Salons</MenuItem>
+              <MenuItem onClick={() => handleClose("/hosting")}>Hosting</MenuItem>
+              <MenuItem onClick={() => handleClose("/community")}>Community</MenuItem>
+              <MenuItem onClick={() => handleClose("/membership")}>Plans</MenuItem>
+              {!session && <MenuItem onClick={() => handleClose("/signin")}>Login</MenuItem>}
+              {/* {session && <MenuItem onClick={() => handleClose("/signup")}>Sign up</MenuItem>} */}
+              {session && <MenuItem onClick={() => handleClose("/dashboard")}>My Dashboard</MenuItem>}
+            </Menu>
           </Box>
-        </Toolbar>
-      </AppBar>
-    </Box >
+        </StyledToolbar>
+      </StyledAppBar>
+    </Box>
   );
 }

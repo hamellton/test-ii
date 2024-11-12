@@ -16,4 +16,5 @@ export const StyledChip = styled.div`
   align-items: center;
   justify-content: center;
   white-space: nowrap;
+  z-index: 3;
 `;

@@ -333,6 +333,7 @@ export interface PublicTicketSeriesCheckoutJSONObject extends AttendeeValues {
   bookingFee: number
   slug: string
   seriesTitle: string
+  seriesId: string
 }
 
 export interface MemberCheckoutJSONObject {
@@ -363,10 +364,9 @@ export interface StripeTicketData {
 export interface StripeSeriesTicketData {
   attendees: Attendee[]
   selectedEpisodes: string[]
-  // salonId: string
-  // priceId: string
   customerEmail: string
   accountId: string
+  seriesId: string
 }
 
 export interface CustomStandaloneSearchBox extends StandaloneSearchBoxProps {

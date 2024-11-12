@@ -45,10 +45,14 @@ const handleApproveRequest = async (req: AuthorizedRequest, res: NextApiResponse
     return res.status(400).json({ error: "Bad Request - ID is missing or invalid" });
   }
   try {
+    // Get the salon's previous state before approval
+    const previousSalon = await getSalonById(salonId);
+    const wasSubmitted = Boolean(previousSalon && previousSalon.state === "SUBMITTED");
+
     // Approve the salon with the given ID
     const salon = await approveSalonById(salonId);
 
-    if (salon) await emailSalonApproval(salonId, salon.hostId);
+    if (salon) await emailSalonApproval(salonId, salon.hostId, wasSubmitted);
     
     res.status(204).end();
   } catch (error) {

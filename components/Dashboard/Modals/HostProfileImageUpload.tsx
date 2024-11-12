@@ -3,7 +3,7 @@ import Image from "next/image";
 // import { GravatarQuickEditorCore } from "@gravatar-com/quick-editor";
 // import sha256 from "crypto-js/sha256";
 // import encHex from "crypto-js/enc-hex";
-import { useState } from "react";
+// import { useState } from "react";
 // import useSWR from "swr";
 // import { frontEndAuthResponse } from "@utils/types";
 // import { USER_STATUS_ENDPOINT } from "@config";
@@ -23,7 +23,7 @@ export default function HostProfileImageUpload({
   handleProfileSelect,
   handleFileReset,
   previewUrl,
-  setSelectedFile
+  // setSelectedFile
 }: {
   handleProfileSelect: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleFileReset: () => void;
@@ -33,7 +33,7 @@ export default function HostProfileImageUpload({
 
   // const { data: user, error: userStatusError } = useSWR<frontEndAuthResponse>(USER_STATUS_ENDPOINT, fetchGetJSON);
 
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(previewUrl);
+  // const [avatarUrl, setAvatarUrl] = useState<string | null>(previewUrl);
 
   // const openGravatarEditorCore = () => {
   //   if (userStatusError || !user?.email) {

@@ -27,6 +27,11 @@ import { store } from "@/store";
 import Toast from "@components/Common/Toast/Toast";
 import { initAnalytics, logPageView } from "@utils/analytics";
 import { useRouter } from "next/router";
+import { Inter } from "next/font/google";
+
+const inter = Inter({
+  subsets: ["latin"], 
+});
 
 // import useMemberfulScript from "@/hooks/useMemberfulScript";
 
@@ -72,7 +77,9 @@ export default function MyApp(props: MyAppProps) {
         <CssBaseline />
         <SessionProvider session={session}>
           <Provider store={store}>
-            <Component {...pageProps} />
+            <main className={inter.className}>
+              <Component {...pageProps} />
+            </main>
             <Analytics />
             <Toast />
           </Provider>

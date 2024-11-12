@@ -25,10 +25,11 @@ html
         height: 250px;
         overflow: hidden;
         margin: 0 auto;
+        display: flex;
       }
       .email-header img {
-        width: 100%;
         height: 325px;
+        margin: 0 auto;
       }
       .email-body h1 {
         font-size: 24px;
@@ -52,33 +53,62 @@ html
         color: #777;
         text-decoration: none;
       }
+      .share-buttons {
+        margin-top: 20px;
+      }
+      .share-buttons a {
+        display: inline-block;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        padding: 10px 15px;
+        background-color: #f0f0f0;
+        color: #333;
+        text-decoration: none;
+        border-radius: 5px;
+      }
   body
     .email-container
       .email-header
         img(src="https://interintellect.nyc3.digitaloceanspaces.com/logos/email-logo.png", alt="Interintellect")
       .email-body
-        if count === 1
-          h1 Congratulations on listing your first salon!
-          p Dear #{host.name},
-          p
-            | Congratulations on listing 
-            a(href=`${process.env.NEXTAUTH_URL}/salons/${salon.slug}`) #{salon.title}
-          p
-            | To finalize the publication process and receive payment for your events, please make sure to complete our payment onboarding process on your
-            a(href=`${process.env.NEXTAUTH_URL}/dashboard/payouts`) payout page.
-          p Interintellect Team
-        else
-          h1 Your salon has been approved!
-          p Dear #{host.name},
-          p
-            | Congratulations, 
-            a(href=`${process.env.NEXTAUTH_URL}/salons/${salon.slug}`) #{salon.title}
-            |  has been published! We are excited to help you build your following. Here are some things you might consider doing to help us promote your event:
-          p Go
-          p Interintellect Team
+        case type
+          when 'edit_approved'
+            p Dear #{host.name},
+            p
+              | Your request to edit the details of your event, 
+              a(href=`${process.env.NEXTAUTH_URL}/salons/${salon.slug}`) #{salon.title},
+              |  has been approved.
+            p Interintellect Team
+          when 'first_salon'
+            p Dear #{host.name},
+            p
+              | Congratulations on listing 
+              a(href=`${process.env.NEXTAUTH_URL}/salons/${salon.slug}`) #{salon.title}
+              | !
+            p
+              | To finalize the publication process and receive payment for your events, please ensure you have completed our payment onboarding process on your 
+              a(href=`${process.env.NEXTAUTH_URL}/dashboard/payments`) host payout page
+              | .
+            p For questions or further information, email our customer service team at haley@interintellect.com.
+            p Interintellect Team
+          when 'new_salon'
+            h1 Your salon has been published!
+            p Dear #{host.name},
+            p
+              | Congratulations, 
+              a(href=`${process.env.NEXTAUTH_URL}/salons/${salon.slug}`) #{salon.title}
+              |  has been published!
+            .share-buttons
+              a(href=`https://twitter.com/intent/tweet?url=${encodeURIComponent(`${process.env.NEXTAUTH_URL}/salons/${salon.slug}`)}`) Share on X
+              a(href=`https://substack.com/publish?url=${encodeURIComponent(`${process.env.NEXTAUTH_URL}/salons/${salon.slug}`)}`) Share on Substack
+              a(href=`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`${process.env.NEXTAUTH_URL}/salons/${salon.slug}`)}`) Share on Facebook
+              a(href=`https://www.linkedin.com/shareArticle?url=${encodeURIComponent(`${process.env.NEXTAUTH_URL}/salons/${salon.slug}`)}`) Share on LinkedIn
+            p 
+              | For questions or further information, email our customer service team at 
+              a(href="mailto:haley@interintellect.com") haley@interintellect.com
+              | .
+            p Interintellect Team
       .email-footer
         | © 2024 Pynchon Ideas.
         br
         | 2810 N Church St. PMB 59729 Wilmington, Delaware 19802
-        br
-        a(href="#") Unsubscribe

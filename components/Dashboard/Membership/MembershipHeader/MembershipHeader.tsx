@@ -1,18 +1,22 @@
-import useDevice, { DeviceTypes } from "@/hooks/useDevice";
 import React from "react";
-import { MembershipHeaderContainer, MembershipHeaderTitle, MembershipHeaderSubtitle } from "./MembershipHeaderStyles";
+import { 
+  MembershipHeaderContainer, 
+  MembershipHeaderTitle, 
+  TopLeftImage,
+  BottomRightImage
+} from "./MembershipHeaderStyles";
+import { useRouter } from "next/router";
 
-const MembershipHeader = () => {
-  const { device } = useDevice() ?? {};
+const MembershipHeader = ({ title }: { title: string }) => {
+  const router = useRouter();
 
-  if (device !== DeviceTypes.MOBILE) {
-    return null;
-  }
+  const isMembershipPage = router.pathname === "/membership";
 
   return (
     <MembershipHeaderContainer>
-      <MembershipHeaderTitle>Our packages</MembershipHeaderTitle>
-      <MembershipHeaderSubtitle>Explore different ways to experience Interintellect</MembershipHeaderSubtitle>
+      <TopLeftImage isMembershipPage={isMembershipPage} src="/images/membership-header-1.png" alt="Top Left Decoration" />
+      <MembershipHeaderTitle isMembershipPage={isMembershipPage}>{title}</MembershipHeaderTitle>
+      <BottomRightImage isMembershipPage={isMembershipPage} src="/images/membership-header-2.png" alt="Bottom Right Decoration" />
     </MembershipHeaderContainer>
   );
 };

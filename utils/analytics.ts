@@ -1,11 +1,10 @@
 import { track as trackVercel } from "@vercel/analytics/react";
 import { EventCategories, EventNames } from "@config";
 
-const GA_TRACKING_ID = "G-XVF0ZDKDJQ";
 
 export const initGA = () => {
   const script1 = document.createElement("script");
-  script1.src = `https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`;
+  script1.src = `https://www.googletagmanager.com/gtag/js?id=${process.env.GA_TRACKING_ID}`;
   script1.async = true;
   document.head.appendChild(script1);
 
@@ -14,7 +13,7 @@ export const initGA = () => {
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-    gtag('config', '${GA_TRACKING_ID}');
+    gtag('config', '${process.env.GA_TRACKING_ID}');
   `;
   document.head.appendChild(script2);
 };

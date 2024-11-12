@@ -4,9 +4,6 @@ import { Card, CardContent, CardMedia, Divider, Grid, Typography } from "@mui/ma
 import NextSalonInfoBox from "./NextSalonInfoBox/NextSalonInfoBox";
 import styled from "styled-components";
 import Link from "next/link";
-import useSWR from "swr";
-import { USER_ENDPOINT } from "@config";
-import { fetchGetJSON } from "@utils/api-helpers";
 import { HostDetails, NextSalonHostInfo } from "./NextSalon.styles";
 import Image from "next/image";
 

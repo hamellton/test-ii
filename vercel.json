@@ -1,0 +1,9 @@
+{
+    "crons": [
+      {
+        "path": "/api/common/event-reminders",
+        "schedule": "* * * * *"
+      }
+    ]
+  }
+  

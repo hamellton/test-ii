@@ -60,20 +60,29 @@ html
       .email-header
         img(src="https://interintellect.nyc3.digitaloceanspaces.com/logos/email-logo.png", alt="Interintellect")
       .email-body
-        h1 Your Zoom Details for #{salon.title}
         p Dear #{name},
-        p Here are the details for your upcoming salon:
+        p Here are the details for your upcoming in-person salon:
         p
-          a(href=`${process.env.NEXTAUTH_URL}/salons/${salon.slug}`) #{salon.title}
-          |  on #{date} at #{time}.
+          a(href=salonUrl) #{salon.title}
+          |  at #{salon.location}.
         p
-          | Zoom link to join: 
-          a(href=salon.zoomJoinUrl) #{salon.zoomJoinUrl}
-        p Join the world of conversation and enjoy your salon!
+          | Google Maps link: 
+          a(href=salon.locationUrl) #{salon.locationUrl}
+        p Date and time: #{date} at #{time}
+        p
+          | Add to my calendar: 
+          a(href=googleCalendarLink) Google
+        p
+          | You will receive reminders and details prior to the event. To manage your notification settings, click 
+          a(href=`${process.env.NEXTAUTH_URL}/dashboard/notifications`) here
+          | .
+        p
+          | For questions or further information, email our customer service team at 
+          a(href="mailto:haley@interintellect.com") haley@interintellect.com
+          | .
+        p We look forward to seeing you!
         p Interintellect Team
       .email-footer
         | © 2024 Pynchon Ideas.
         br
         | 2810 N Church St. PMB 59729 Wilmington, Delaware 19802
-        br
-        a(href="#") Unsubscribe

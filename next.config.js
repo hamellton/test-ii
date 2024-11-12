@@ -4,6 +4,9 @@ const path = require("path");
 const nextConfig = {
   transpilePackages: ["crypto-js"],
   reactStrictMode: true,
+  env: {
+    GA_TRACKING_ID: process.env.GA_TRACKING_ID,
+  },
   redirects: async () => {
     return [
       // For Logout we redirect to our home page

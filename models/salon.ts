@@ -167,6 +167,7 @@ export const getSalonBySlug = async (slug: string): Promise<ExtendedSalon | null
     },
     include: {
       coHosts: true,
+      host: true,
       tags: true,
       publicTickets: true,
       memberTickets: true,
@@ -544,4 +545,52 @@ export const getSeriesEpisodesForUser = async (userId: string): Promise<Salon[]>
   });
 
   return salons;
+};
+
+export const getEvents = async (options: { reminderTime: string }) => {
+  const now = new Date();
+  const upcomingEvents = await prisma.salon.findMany({
+    where: {
+      startTime: {
+        gte: now,
+      },
+    },
+    select: {
+      id: true,
+      title: true,
+      hostId: true,
+      startTime: true,
+      endTime: true,
+      memberTickets: {
+        select: {
+          user: {
+            select: {
+              email: true,
+              name: true,
+              notifyOnCreate: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const eventsToNotify = upcomingEvents.filter(event => {
+    const timeUntilStart = event.startTime.getTime() - now.getTime();
+    
+    switch (options.reminderTime) {
+    case "24h":
+      return timeUntilStart <= 24 * 60 * 60 * 1000 && timeUntilStart > 23 * 60 * 60 * 1000;
+    case "8h":
+      return timeUntilStart <= 8 * 60 * 60 * 1000 && timeUntilStart > 7 * 60 * 60 * 1000;
+    case "15m":
+      return timeUntilStart <= 15 * 60 * 1000 && timeUntilStart > 14 * 60 * 1000;
+    case "3h":
+      return timeUntilStart <= 3 * 60 * 60 * 1000 && timeUntilStart > 2 * 60 * 60 * 1000;
+    default:
+      return false;
+    }
+  });
+
+  return eventsToNotify;
 };

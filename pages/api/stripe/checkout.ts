@@ -24,7 +24,7 @@ const ticketCheckout = async (req: NextApiRequest, res: NextApiResponse<StripeSe
 };
 
 const seriesCheckout = async (req: NextApiRequest, res: NextApiResponse<StripeSession | ErrorResponse>) => {
-  const { attendees, bookingFee, selectedEpisodes, hostId, slug, seriesTitle } = req.body;
+  const { attendees, bookingFee, selectedEpisodes, hostId, slug, seriesTitle, seriesId } = req.body;
   const host: User | null = await getUserById(hostId);
 
   if (!attendees || !selectedEpisodes || !host || !host?.stripeConnectedAccountId || !slug || !seriesTitle) {
@@ -40,7 +40,8 @@ const seriesCheckout = async (req: NextApiRequest, res: NextApiResponse<StripeSe
       host?.stripeConnectedAccountId,
       bookingFeeInCents,
       slug,
-      seriesTitle
+      seriesTitle,
+      seriesId,
     );
 
     await handleNewsletterSubscription(req);

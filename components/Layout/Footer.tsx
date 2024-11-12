@@ -1,74 +1,147 @@
-import { Button, Grid, List, ListItem, TextField, styled } from "@mui/material";
-import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
-import Typography from "@mui/material/Typography";
 import Link from "next/link";
-import { II_FACEBOOK, II_INSTAGRAM, II_LINKEDIN, II_SUBSTACK, II_TWITTER, II_YOUTUBE, NEWSLETTER_SUBSCRIBE } from "@config";
-import { showToast } from "@/store";
-import { useState } from "react";
+import React, { useState } from "react";
+import styled from "styled-components";
 import { useDispatch } from "react-redux";
+import { showToast } from "@/store";
+import { II_CONTENTFUL_API, II_FACEBOOK, II_INSTAGRAM, II_LINKEDIN, II_SUBSTACK, II_TWITTER, II_YOUTUBE, NEWSLETTER_SUBSCRIBE } from "@config";
+import { Button, TextField } from "@mui/material";
+import useSWR from "swr";
+import { FooterPageData, SocialIcon } from "@utils/contentfulTypes";
+import Image from "next/image";
 
-const linkStyles = {
-  lineHeight: "18px",
-  fontWeight: "700",
-  fontSize: "12px",
-  marginLeft: "1em",
-};
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 120px 130px 20px 120px;
 
-const upperLinkStyles = {
-  color: "white",
-  lineHeight: "18px",
-  fontSize: {
-    xs: "14px",
-    md: "14px",
-  },
-};
+  @media (max-width: 768px) {
+    padding: 20px;
+  }
+`;
 
-// First, declare a type for the props you expect, including the custom ones
-interface CssTextFieldProps {
-  focusColor?: string; // Add other custom props as needed
-}
+const ContentBlock = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 20px;
 
-// Then, declare your styled component with the extended props
-const CssTextField = styled(TextField, {
-  shouldForwardProp: (prop) => prop !== "focusColor",
-})<CssTextFieldProps>(({ focusColor, ...other }) => ({
-  // Use focusColor as a regular prop here
-  "& label.Mui-focused": {
-    color: focusColor,
-  },
-  "& .MuiInput-underline:after": {
-    borderBottomColor: focusColor,
-  },
-  "& .MuiFilledInput-underline:after": {
-    borderBottomColor: focusColor,
-  },
-  "& .MuiOutlinedInput-root": {
-    "& fieldset": {
-      borderColor: "white",
-    },
-    "&:hover fieldset": {
-      borderColor: "white",
-    },
-    "&.Mui-focused fieldset": {
-      borderColor: focusColor,
-    },
-  },
-}));
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+`;
 
+const MainContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 426px;
+`;
 
+const Title = styled.h2`
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 40px;
+  text-align: left;
+  margin: 0 0 24px 0;
+  color: #231F20;
+`;
+
+const Form = styled.form`
+  display: flex;
+  align-items: center;
+  width: 100%;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 20px;
+    
+    button {
+      border-radius: 8px;
+      padding: 12px 42px;
+    }
+  }
+`;
+
+const Quote = styled.p`
+  margin-top: 24px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 24px;
+  letter-spacing: 0.01em;
+  text-align: left;
+  color: #231F20;
+`;
+
+const SocialIcons = styled.div`
+  display: flex;
+  gap: 40px;
+
+  @media (max-width: 768px) {
+    gap: 20px;
+  }
+`;
+
+const FooterBlock = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 20px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 24px;
+  letter-spacing: 0.01em;
+  text-align: left;
+  color: #231F20;
+  opacity: 50%;
+  border-top: 2px solid #F7E6C3;
+  padding-top: 12px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 20px;
+  }
+`;
+
+const FooterText = styled.div`
+  font-size: 14px;
+  color: #666;
+`;
+
+const FooterLinks = styled.div`
+  display: flex;
+  gap: 20px;
+
+  @media (max-width: 768px) {
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+  }
+`;
+
+const SubscriptionButton = styled(Button)`
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 0 8px 8px 0;
+  margin: auto;
+`;
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const Footer = () => {
-  const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const { data: contenfulPage } = useSWR<FooterPageData>(`${II_CONTENTFUL_API}/pages?name=footerPage`, fetcher);
 
   const dispatch = useDispatch();
-  const handleSubscribe = async () => {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubscribe = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setLoading(true);
-    setSuccess("");
-    setError("");
 
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(email)) {
@@ -91,10 +164,7 @@ const Footer = () => {
       if (response.ok) {
         if (data.status === "exists") {
           dispatch(showToast({ message: "You are already subscribed to the newsletter." }));
-        } else if (data.status === "success") {
-          dispatch(showToast({ message: "Thank you for subscribing!", success: true }));
-          setEmail("");
-        } else if (data.status === "resubscribed") {
+        } else if (data.status === "success" || data.status === "resubscribed") {
           dispatch(showToast({ message: "Thank you for subscribing!", success: true }));
           setEmail("");
         } else {
@@ -109,209 +179,81 @@ const Footer = () => {
       setLoading(false);
     }
   };
-  
-  const linkGroups = [
-    [
-      { label: "Home", href: "/" },
-      { label: "Salons & Gatherings", href: "/salons" },
-      { label: "Hosting", href: "/hosting" }
-    ],
-    [
-      { label: "Life in the Community", href: "/community" },
-      { label: "Membership", href: "/membership" },
-      { label: "Contact us", href: "mailto:support@interintellect.com" }
-    ],
-    [
-      { label: "Facebook", href: `${II_FACEBOOK}` },
-      { label: "Instagram", href: `${II_INSTAGRAM}` },
-      { label: "X", href: `${II_TWITTER}` },
-      { label: "Substack", href: `${II_SUBSTACK}` },
-      { label: "Youtube", href: `${II_YOUTUBE}` },
-      { label: "LinkedIn", href: `${II_LINKEDIN}` }
-    ],
-  ];
+
+  if (!contenfulPage) {
+    return null;
+  } 
+
+  const {
+    socialIcons,
+    newsletterTitle,
+    quoteText,
+    footerText,
+    footerLinks,
+  } = contenfulPage.value;
+
+  const socialIconsData = socialIcons && socialIcons.length > 0 ? socialIcons : [];
+  const footerLinksData = footerLinks && footerLinks.length > 0 ? footerLinks : [];
 
   return (
-    <Box
-      component="footer"
-      sx={{
-        mt: "auto",
-      }}
-    >
-
-      <Container
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          flexDirection: {
-            xs: "column",
-            md: "row",
-          },
-          paddingTop: "2em",
-          paddingBottom: "2em",
-          background: "#231F20",
-          color: "white",
-          marginRight: "0 !important",
-          marginLeft: "0 !important",
-          maxWidth: "100% !important",
-        }}>
-
-
-        {/* Desktop CTA */}
-        <Box sx={{
-          maxWidth: "520px",
-          display: {
-            xs: "none",
-            md: "block",
-          },
-        }}>
-          <Typography sx={{
-            fontSize: "32px",
-            lineHeight: "48px",
-            fontWeight: "700",
-          }}>
-            Stay in the loop
-          </Typography>
-          <Box component="form" noValidate autoComplete="off" sx={{ display: "flex", alignItems: "center", my: 1 }}>
-            <CssTextField 
-              id="email-desktop" 
-              label="Email" 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              variant="outlined" 
-              size="small" 
-              sx={{
-                background: "transparent",
-                color: "white",
-                borderRadius: 1,
-                input: {
-                  color: "white"
-                }
-              }}
-              focusColor="white"
-              InputLabelProps={{
-                sx: {
-                // set the color of the label when not shrinked
-                  color: "white",
-                }
-              }}
-            />
-            <Button
-              variant="contained" 
-              sx={{ ml: 1 }} 
-              onClick={handleSubscribe}
-              disabled={loading}
-            >
-              {loading ? "Subscribing..." : "Subscribe"}
-            </Button>
-          </Box>
-        </Box>
-
-
-        <Box sx={{ maxWidth: "630px" }}>
-          <Grid container spacing={2}>
-            {linkGroups.map((group, groupIndex) => (
-              <Grid item xs={12} md={4} key={groupIndex}>
-                <Box>
-                  <List>
-                    {group.map((link, linkIndex) => (
-                      <ListItem key={linkIndex}>
-                        <Link href={link.href} passHref>
-                          <Typography sx={upperLinkStyles}>
-                            {link.label}
-                          </Typography>
-                        </Link>
-                      </ListItem>
-                    ))}
-                  </List>
-                </Box>
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
-
-
-        {/* Mobile CTA */}
-        <Box sx={{
-          maxWidth: "520px",
-          display: {
-            xs: "flex",
-            md: "none",
-          },
-          mt: "2em",
-          flexDirection: "column",
-        }}>
-          <Typography sx={{
-            fontSize: "32px",
-            lineHeight: "48px",
-            fontWeight: "700",
-          }}>
-            Stay in the loop
-          </Typography>
-
-          <Box component="form" noValidate autoComplete="off" sx={{
-            display: "flex",
-            flexDirection: "column", // Set flex direction to column
-            alignItems: "stretch", // Stretch children to fill the width
-            my: 1
-          }}>
-            <CssTextField
-              id="email" 
+    <Container>
+      <ContentBlock>
+        <MainContent>
+          <Title>{newsletterTitle}</Title>
+          <Form onSubmit={handleSubscribe}>
+            <TextField
+              fullWidth
+              id="Email"
               label="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="email"
               variant="outlined"
-              size="small"
+              margin="normal"
+              name="startTime"
+              onChange={(e) => setEmail(e.target.value)}
+              value={email}
               sx={{
-                width: "100%", // Full width
-                background: "transparent",
-                color: "white",
-                borderRadius: 1,
-                input: {
-                  color: "white"
-                }
-              }}
-              focusColor="white"
-              InputLabelProps={{
-                sx: {
-                  color: "white",
-                }
+                height: "56px",
+                margin: "0",
+                "& .MuiOutlinedInput-input": {
+                  borderRadius: "4px 0 0 4px",
+                  padding: "0 12px",
+                  fontSize: "16px",
+                  fontWeight: "400",
+                  lineHeight: "24px",
+                  textAlign: "left",
+                  color: "#231F20",
+                  height: "56px",
+                  margin: "0",
+                },
               }}
             />
-            <Button
-              variant="contained" 
-              sx={{ ml: 1, width: "100%" }} 
-              onClick={handleSubscribe}
-              disabled={loading}
-            >
+            <SubscriptionButton variant="contained" disabled={loading} type="submit">
               {loading ? "Subscribing..." : "Subscribe"}
-            </Button>
-          </Box>
-        </Box>
-      </Container>
-
-
-
-      <Container maxWidth="xl" sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: "0.5em", paddingBottom: "0.5em" }}>
-        <Typography variant="body2">
-          © Pynchon Ideas, 2024. 2810 N Church St. PMB 59729 Wilmington, Delaware 19802. All Rights Reserved.
-        </Typography>
-        <Box>
-          <Link href="/legal#privacy" style={linkStyles}>
-            Privacy Policy
-          </Link>
-          <Link href="/legal#terms" style={linkStyles}>
-            Terms of Service
-          </Link>
-          <Link href="/host-agreement" style={linkStyles}>
-            Host Agreement
-          </Link>
-          <Link href="/legal#cookie" style={linkStyles}>
-            Cookies Settings
-          </Link>
-        </Box>
-      </Container>
-    </Box >
+            </SubscriptionButton>
+          </Form>
+          <Quote>{quoteText}</Quote>
+        </MainContent>
+        <SocialIcons>
+          {socialIconsData.length > 0 && socialIconsData.map((icon: SocialIcon) => (
+            <Link key={icon.id} href={icon.url} passHref>
+              <Image src={icon.image.imageUrl} alt={icon.image.alt} width="48" height="48" />
+            </Link>
+          ))}
+        </SocialIcons>
+      </ContentBlock>
+      <FooterBlock>
+        <FooterText>{footerText}</FooterText>
+        <FooterLinks>
+          {footerLinksData.length > 0 && footerLinksData.map(link => {
+            return (
+              <Link key={link.id} href={link.url} passHref>
+                {link.title}
+              </Link>
+            );
+          })}
+        </FooterLinks>
+      </FooterBlock>
+    </Container>
   );
 };
 

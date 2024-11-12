@@ -14,20 +14,15 @@ const PUBLIC_NEWSLETTER_TAG = "Public Newsletter";
 export const addSubscriberToList = async (email: string, firstName?: string, lastName?: string) => {
   try {
     const searchResult = await Mailchimp.searchMembers.search(email);
-  
+
     if (searchResult.exact_matches.total_items > 0) {
       const subscriber = searchResult.exact_matches.members[0];
-  
+
       if (subscriber.status === "subscribed") {
-        const existingTags = subscriber.tags.map((tag: any) => tag.name);
-        if (!existingTags.includes(PUBLIC_NEWSLETTER_TAG)) {
-          await Mailchimp.lists.updateListMember(AUDIENCE_ID, subscriber.id, {
-            tags: [{ name: PUBLIC_NEWSLETTER_TAG, status: "active" }],
-          });
-        }
+        await ensureTagExists(AUDIENCE_ID, subscriber.id, PUBLIC_NEWSLETTER_TAG);
         return { message: "Subscriber already exists and is subscribed", existing: true };
       }
-  
+
       if (subscriber.status === "unsubscribed") {
         const response = await Mailchimp.lists.updateListMember(AUDIENCE_ID, subscriber.id, {
           status: "subscribed",
@@ -35,13 +30,14 @@ export const addSubscriberToList = async (email: string, firstName?: string, las
             FNAME: firstName || subscriber.merge_fields.FNAME || "",
             LNAME: lastName || subscriber.merge_fields.LNAME || "",
           },
-          tags: [{ name: PUBLIC_NEWSLETTER_TAG, status: "active" }],
         });
-  
+
+        await ensureTagExists(AUDIENCE_ID, subscriber.id, PUBLIC_NEWSLETTER_TAG);
+        console.log(`Tag '${PUBLIC_NEWSLETTER_TAG}' added to re-subscribed subscriber.`);
         return { message: "Subscriber was unsubscribed but has been resubscribed", response };
       }
     }
-  
+
     const response = await Mailchimp.lists.addListMember(AUDIENCE_ID, {
       email_address: email,
       status: "subscribed",
@@ -49,15 +45,33 @@ export const addSubscriberToList = async (email: string, firstName?: string, las
         FNAME: firstName || "",
         LNAME: lastName || "",
       },
-      tags: [{ name: PUBLIC_NEWSLETTER_TAG, status: "active" }],
+      tags: [PUBLIC_NEWSLETTER_TAG],
     });
-  
+
     return { message: "Successfully added new subscriber", response };
   } catch (error: any) {
     console.error("Error adding subscriber to Mailchimp:", error.response?.body || error);
     throw new Error(error.response?.body?.detail || error.message || "Failed to add subscriber");
   }
 };
+
+async function ensureTagExists(AUDIENCE_ID: string, subscriberId: string, tagName: string) {
+  try {
+    const subscriber = await Mailchimp.lists.getListMember(AUDIENCE_ID, subscriberId);
+    const existingTags = subscriber.tags.map((tag: any) => tag.name);
+    
+    if (!existingTags.includes(tagName)) {
+      await Mailchimp.lists.updateListMemberTags(AUDIENCE_ID, subscriberId, {
+        tags: [{ name: tagName, status: "active" }],
+      });
+      console.log(`Tag '${tagName}' added to subscriber.`);
+    } else {
+      console.log(`Tag '${tagName}' already exists for subscriber.`);
+    }
+  } catch (error) {
+    console.error("Error in ensureTagExists:", (error as any).response?.body || error);
+  }
+}
 
 export const removeSubscriberFromList = async (email: string) => {
   try {
@@ -70,7 +84,7 @@ export const removeSubscriberFromList = async (email: string) => {
   
     const response = await Mailchimp.lists.updateListMember(AUDIENCE_ID, subscriberId, {
       status: "unsubscribed",
-      tags: [{ name: PUBLIC_NEWSLETTER_TAG, status: "inactive" }],
+      tags: [{ name: PUBLIC_NEWSLETTER_TAG }],
     });
   
     return response;

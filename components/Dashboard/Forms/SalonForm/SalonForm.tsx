@@ -109,16 +109,16 @@ export default function SalonForm({ isLoading, setIsLoading, isEpisode }: { isLo
       return;
     }
 
-    if (user && !user?.isAdmin && user?.userId !== salon?.hostId) {
-      router.push("/dashboard/my-events");
-      return;
-    }
+    // if (user && !user?.isAdmin && user?.userId !== salon?.hostId) {
+    //   router.push("/dashboard/my-events");
+    //   return;
+    // }
   
     if (salon) {
       setInitialValues(formatSalonDBToFrontEnd(salon));
       if (salon.imageUrl && !isFileReset) setPreviewUrl(salon.imageUrl);
     }
-  }, [salon, user, router, isFileReset]); 
+  }, [salon, user, router, isFileReset, id]); 
 
   useEffect(() => {
     const updateTime = () => {

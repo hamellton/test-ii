@@ -1,5 +1,5 @@
 import prisma from "@utils/db";
-import { PublicTicket, MemberTicket, Salon } from "@prisma/client";
+import { PublicTicket, MemberTicket, Salon, TicketStatus } from "@prisma/client";
 import { getUserById, updateUser } from "@models/user";
 import { Payout } from "@utils/types";
 
@@ -10,7 +10,8 @@ export const buyPublicTicket = async (email: string, name: string, customerEmail
       name: name,
       customerEmail: customerEmail,
       salonId: salonId,
-      stripePaymentId: stripePaymentId
+      stripePaymentId: stripePaymentId,
+      status: TicketStatus.PENDING,
     }
   });
 };

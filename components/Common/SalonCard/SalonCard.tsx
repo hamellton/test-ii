@@ -82,7 +82,9 @@ const SalonCard = ({
       host?: User,
     }) => {
   const router = useRouter();
-  const isHostPage = router.pathname.includes("/hosts/");
+
+  const isHomePage = router.pathname === "/";
+  const isHostPage = router.pathname.includes("/hosts/") || isHomePage;
 
   const isSpecialPage = router.pathname === "/payment/success" || isHostPage;
 

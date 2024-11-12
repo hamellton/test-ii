@@ -1,75 +1,116 @@
-import { Avatar, Box, Grid, Typography } from "@mui/material";
+import styled from "styled-components";
+import { Grid, Typography } from "@mui/material";
+import { Testimonial } from "@utils/contentfulTypes";
 
-export default function Testimonials() {
+interface ITestimonialsProps {
+  data: Testimonial[];
+  isHomePage?: boolean;
+}
 
-  const profiles = [
-    { src: '/images/avatar.png', alt: 'Profile 1', name: 'Patricia Hurducas', title: 'Writer, researcher | The Flâneurs Project', quote: '"Hosting Interintellect salons completely changed my life for the better. I followed my many curiosities and embarked on hour-long conversations with incredible people, many of them I can now call friends."' }, // Replace with actual image paths and alt text
-    {
-      src: '/images/avatar.png', alt: 'Profile 2', name: 'Christopher Valore', title: 'Writer', quote: '"I love the Interintellect community. There are always people discussing or sharing interesting topics, and the quality of the discourse is unmatched. The Discord community in particular has a welcoming vibe that I find fulfilling to be a part of."'
-    },
-    { src: '/images/avatar.png', alt: 'Profile 2', name: 'Isabela Granic', title: 'Developmental psychologist', quote: '"For me, the ii represents a collective consciousness that fuses some of the brightest, most inspiring, and curious minds in an emergent mash up of wisdom and fun."' },
-    // ...more profiles
-  ];
+const TestimonialsWrapper = styled.div<{ isHomePage: boolean }>`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 60px;
+  margin-bottom: 120px;
+  margin-top: 120px;
+  margin-top: ${({ isHomePage }) => (isHomePage ? "0" : "120px")};
+
+  @media (max-width: 768px) {
+    margin-bottom: 40px;
+    margin-top: ${({ isHomePage }) => (isHomePage ? "0" : "60px")};
+  }
+`;
+
+const Title = styled.div`
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 48px;
+  letter-spacing: 0.05em;
+  text-align: center;
+  color: #231F20;
+`;
+
+const Quote = styled(Typography)`
+  margin-bottom: 32px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 32px;
+  letter-spacing: 0.02em;
+  text-align: left;
+  color: #231F20;
+  flex: 1;
+`;
+
+const Name = styled(Typography)`
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 24px;
+  letter-spacing: 0.05em;
+  text-align: left;
+  color: #FC714E;
+  margin-bottom: 8px;
+`;
+
+const JobTitle = styled(Typography)`
+  font-family: Inter;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: 0.05em;
+  text-align: left;
+  color: #231F20;
+`;
+
+const ProfileGridItem = styled(Grid)`
+  max-width: 340px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+`;
+
+const TestimonialsContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 80px;
+
+  @media (max-width: 768px) {
+    flex-wrap: wrap;
+    padding: 0 20px;
+    gap: 20px;
+  }
+`;
+
+export default function Testimonials({ data, isHomePage }: ITestimonialsProps) {
 
   return (
-    <>
-      <Typography
-        variant="h2"
-        component="h2"
-        sx={{
-          fontSize: '32px',
-          fontWeight: 700,
-          marginBottom: '0',
-          lineHeight: '1em',
-          textAlign: 'center', // Align text center here
-          width: '100%', // Ensure the Typography component takes full width
-        }}
-      >
+    <TestimonialsWrapper isHomePage={isHomePage ? isHomePage : false}>
+      <Title>
         Our community and hosts said about us...
-      </Typography>
+      </Title>
 
-      <Grid container alignItems="flex-start" justifyContent="center" spacing={2} sx={{
-        marginTop: '2em',
-        marginBottom: '6em',
-      }}>
+      <TestimonialsContainer>
         {
-          profiles.map((profile, index) => (
-            <Grid item key={index} sx={{
-              maxWidth: '333px',
-              textAlign: 'center',
-            }}>
-              <Typography sx={{
-                marginBottom: '2em',
-                color: '#605054',
-                fontSize: '16px',
-              }}
-              >
-                {profile.quote}
-              </Typography>
-              {/* <Box display={'flex'} alignItems={'center'} justifyContent={'center'} marginBottom={'1em'}>
-                <Avatar key={index} src={profile.src} alt={profile.alt} sx={{ width: 56, height: 56 }}>
-                  {profile.name}
-                </Avatar>
-              </Box> */}
-              <Typography sx={{
-                fontWeight: 700,
-                fontSize: '20px',
-                marginBottom: '0.5em',
-              }}>
+          data.map((profile, index) => (
+            <ProfileGridItem item key={index}>
+              <Quote>
+                {profile.comment}
+              </Quote>
+              <svg width="30" height="24" viewBox="0 0 30 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16.875 12.95V0H30V13.135C30 22.015 21.5625 23.125 21.5625 23.125L20.4375 20.535C20.4375 20.535 24.1875 19.98 24.9375 17.02C25.6875 14.8 24.1875 12.95 24.1875 12.95H16.875Z" fill="#FC714E" />
+                <path d="M0 12.95V0H13.125V13.135C13.125 22.015 4.6875 23.125 4.6875 23.125L3.5625 20.535C3.5625 20.535 7.3125 19.98 8.0625 17.02C8.8125 14.8 7.3125 12.95 7.3125 12.95H0Z" fill="#FC714E" />
+              </svg>
+              <Name>
                 {profile.name}
-              </Typography>
-              <Typography sx={{
-                fontWeight: 700,
-                fontSize: '15px',
-                marginBottom: '1em',
-                color: '#827A7A'
-              }}>
+              </Name>
+              <JobTitle>
                 {profile.title}
-              </Typography>
-            </Grid>
+              </JobTitle>
+            </ProfileGridItem>
           ))
         }
-      </Grid >
-    </>
-  )
+      </TestimonialsContainer>
+    </TestimonialsWrapper>
+  );
 }

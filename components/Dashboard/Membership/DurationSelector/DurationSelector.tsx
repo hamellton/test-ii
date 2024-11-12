@@ -16,7 +16,8 @@ const getTypeDetails = (type: MembershipDuration) => {
 
 export default function DurationSelector({ type, handleDurationChange, selected }: { type: MembershipDuration, handleDurationChange: (type: MembershipDuration) => void, selected: boolean }) {
   const { text, color } = getTypeDetails(type);
-  const marginTop = type ? "12px" : "35px";
+  // const marginTop = type ? "12px" : "35px";
+  const marginTop = "0";
 
   return (
     <DurationSelectorBox color={color} selected={selected} mt={marginTop}>

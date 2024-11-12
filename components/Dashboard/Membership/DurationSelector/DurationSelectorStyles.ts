@@ -22,7 +22,6 @@ export const DurationSelectorTypography = styled.div`
   margin-left: 3px;
   margin-top: 1px;
   margin-right: 1px;
-  font-family: "Abhaya Libre, serif";
   color: #231F20;
   cursor: pointer;
   display: flex;

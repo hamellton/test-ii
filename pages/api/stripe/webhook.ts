@@ -5,7 +5,7 @@ import { HTTPMethod, StripeSeriesTicketData, StripeTicketData } from "@utils/typ
 import { buyPublicTicket } from "@models/ticket";
 import { createTip } from "@models/tip";
 import { PublicTicket } from "@prisma/client";
-import { emailTicketConfirmation, notifyPurchaseEvent, notifyTip } from "@services/email";
+import { emailSeriesTicketConfirmation, emailTicketConfirmation, notifyPurchaseEvent, notifyTip } from "@services/email";
 import { getStripePaymentFromSessionId } from "@services/stripe";
 import { getSalonById } from "@models/salon";
 import { canPublicCheckout } from "@utils/frontend-helpers";
@@ -30,15 +30,25 @@ const handleTicketCheckout = async (ticketInfo: StripeTicketData, session: Strip
 
   if (shouldProceed) {
     try {
-      const paymentIntent = await stripe.paymentIntents.capture(
+
+      const paymentIntent = await stripe.paymentIntents.retrieve(
         session.payment_intent as string,
         { stripeAccount: connectedAccountId }
       );
+      console.log("🚀 ~ handleTicketCheckout ~ paymentIntent:", paymentIntent)
+
+      // if (paymentIntent.status === "requires_capture") {
+      //   await stripe.paymentIntents.capture(
+      //     session.payment_intent as string,
+      //     { stripeAccount: connectedAccountId }
+      //   );
+      // }
       console.log("PaymentIntent captured successfully", paymentIntent);
 
       const results = await Promise.allSettled(
         ticketInfo.attendees.map(attendee =>
-          buyPublicTicket(attendee.email, attendee.name, ticketInfo.customerEmail, ticketInfo.salonId, ticketInfo.priceId)
+          // buyPublicTicket(attendee.email, attendee.name, ticketInfo.customerEmail, ticketInfo.salonId, ticketInfo.priceId)
+          buyPublicTicket(attendee.email, attendee.name, ticketInfo.customerEmail, ticketInfo.salonId, paymentIntent.id)
         )
       );
 
@@ -106,11 +116,12 @@ const handleSeriesTicketCheckout = async (seriesTicketInfo: StripeSeriesTicketDa
 
       console.log(`Created the following tickets for episode ${episodeId}: `, tickets);
 
-      // await emailTicketConfirmation(
-      //   tickets[0].salonId,
-      //   tickets.map(ticket => ticket.email),
-      //   tickets.map(ticket => ticket.name)
-      // );
+      await emailSeriesTicketConfirmation(
+        seriesTicketInfo?.seriesId,
+        seriesTicketInfo?.customerEmail,
+        tickets.map(ticket => ticket.email),
+        tickets.map(ticket => ticket.name)
+      );
 
       return tickets;
     });

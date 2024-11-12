@@ -3,45 +3,26 @@ import styled from "styled-components";
 export const MembershipList = styled.ul`
   list-style-type: none;
   padding-left: 0;
-  font-family: 'Abhaya Libre';
-  font-size: 15px;
 
   li {
+    display: flex;
+    align-items: center;
     position: relative;
-    padding-left: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     color: #231F20;
-    font-weight: 500;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    letter-spacing: 0.02em;
+    text-align: left;
 
-    &::before {
-      content: "-";
-      position: absolute;
-      left: 0;
-      color: black;
-    }
-  }
-`;
+    
 
-export const MembershipNotes = styled.ul`
-  list-style-type: none;
-  padding-left: 0;
-  margin-left: 0;
-  margin-top: 10px;
-
-  li {
-    position: relative;
-    padding-left: 10px;
-    font-weight: 700;
-
-    &::before {
-      content: "*";
-      position: absolute;
-      left: 0;
-      color: black;
-    }
-
-    &:first-child:last-child::before {
-      content: "*";
+    svg {
+      width: 16px;
+      height: 16px;
+      margin-right: 13px;
+      flex-shrink: 0;
     }
   }
 `;
